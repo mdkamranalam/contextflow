@@ -1,0 +1,31 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Frontend build
+client/dist/
+
+# Test coverage
+coverage/
+server/coverage/
+
+# Runtime databases and SQLite sidecars
+server/data/
+*.db
+*.db-shm
+*.db-wal
+
+# Logs, temporary, and OS files
+*.log
+.DS_Store
+Thumbs.db
+
+# Others
+AGENTS.md
