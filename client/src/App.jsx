@@ -13,6 +13,7 @@ export default function App() {
   const [health, setHealth] = useState(null);
   const [error, setError] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [latestToolEvents, setLatestToolEvents] = useState([]);
 
   const fetchHealth = async () => {
     try {
@@ -33,14 +34,22 @@ export default function App() {
     setRefreshKey((k) => k + 1);
   };
 
+  const handleAgentAction = (toolEvents) => {
+    setLatestToolEvents(toolEvents || []);
+    // Always refresh tasks & plan if the agent ran any tools
+    if (toolEvents && toolEvents.length > 0) {
+      triggerRefresh();
+    }
+  };
+
   return (
     <>
       <AppHeader health={health} />
       <main>
         {error && <ErrorMessage error={error} onRetry={fetchHealth} />}
         <AppLayout
-          chat={<ChatPanel onTaskCreated={triggerRefresh} />}
-          activity={<ToolActivityLog />}
+          chat={<ChatPanel onAgentAction={handleAgentAction} />}
+          activity={<ToolActivityLog events={latestToolEvents} />}
           tasks={
             <TaskList
               refreshTrigger={refreshKey}
