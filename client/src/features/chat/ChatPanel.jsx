@@ -13,8 +13,8 @@ export default function ChatPanel({ onAgentAction }) {
   });
   const [isThinking, setIsThinking] = useState(false);
   const [error, setError] = useState(null);
+  const [failedPrompt, setFailedPrompt] = useState(null);
 
-  // Restore messages from SQLite on mount if a sessionId exists
   useEffect(() => {
     if (!sessionId) return;
 
@@ -26,7 +26,6 @@ export default function ChatPanel({ onAgentAction }) {
           setMessages(data.messages);
         }
       } catch (err) {
-        // If session was purged or invalid, start fresh
         console.warn("Could not restore previous session:", err);
         localStorage.removeItem(SESSION_STORAGE_KEY);
         if (isMounted) setSessionId(null);
@@ -48,6 +47,7 @@ export default function ChatPanel({ onAgentAction }) {
     setMessages((prev) => [...prev, userMessage]);
     setIsThinking(true);
     setError(null);
+    setFailedPrompt(null);
 
     try {
       const response = await api.sendMessage(text, sessionId);
@@ -66,14 +66,22 @@ export default function ChatPanel({ onAgentAction }) {
         setMessages((prev) => [...prev, assistantMessage]);
       }
 
-      // Notify parent about tool events so tasks/plans can refresh
       if (onAgentAction) {
         onAgentAction(response?.toolEvents || []);
       }
     } catch (err) {
       setError(err);
+      setFailedPrompt(text);
     } finally {
       setIsThinking(false);
+    }
+  };
+
+  const handleRetry = () => {
+    if (failedPrompt) {
+      // Remove the last failed user message so it doesn't duplicate
+      setMessages((prev) => prev.slice(0, -1));
+      handleSendMessage(failedPrompt);
     }
   };
 
@@ -82,6 +90,7 @@ export default function ChatPanel({ onAgentAction }) {
     setSessionId(null);
     localStorage.removeItem(SESSION_STORAGE_KEY);
     setError(null);
+    setFailedPrompt(null);
   };
 
   return (
@@ -107,7 +116,12 @@ export default function ChatPanel({ onAgentAction }) {
 
       <MessageList messages={messages} isThinking={isThinking} />
 
-      {error && <ErrorMessage error={error} />}
+      {error && (
+        <ErrorMessage
+          error={error}
+          onRetry={failedPrompt ? handleRetry : null}
+        />
+      )}
 
       <MessageInput onSendMessage={handleSendMessage} disabled={isThinking} />
     </div>

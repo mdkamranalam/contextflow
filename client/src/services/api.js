@@ -11,9 +11,12 @@ async function request(endpoint, options = {}) {
   try {
     response = await fetch(url, { ...options, headers });
   } catch (networkError) {
-    throw new Error(
-      `Network error connecting to backend: ${networkError.message}`,
+    const error = new Error(
+      "Cannot reach ContextFlow server. Is the backend running on port 3001?",
     );
+    error.code = "NETWORK_ERROR";
+    error.status = 0;
+    throw error;
   }
 
   let data;
@@ -24,11 +27,24 @@ async function request(endpoint, options = {}) {
   }
 
   if (!response.ok) {
-    const errorMsg =
-      data?.error?.message || `HTTP ${response.status} ${response.statusText}`;
+    let errorMsg = data?.error?.message;
+
+    if (!errorMsg) {
+      if (response.status === 429) {
+        errorMsg =
+          "Request rate limit reached. Please wait a moment before trying again.";
+      } else if (response.status === 503) {
+        errorMsg =
+          "AI inference service unavailable. Please check your GROQ_API_KEY in server/.env.";
+      } else {
+        errorMsg = `Server error (${response.status}): ${response.statusText}`;
+      }
+    }
+
     const error = new Error(errorMsg);
     error.status = response.status;
-    error.code = data?.error?.code || "UNKNOWN_ERROR";
+    error.code = data?.error?.code || `HTTP_${response.status}`;
+    error.details = data?.error?.details;
     throw error;
   }
 

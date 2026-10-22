@@ -90,15 +90,13 @@ export function createApp() {
       const task = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
       return res.status(201).json({ task });
     } catch (err) {
-      return res
-        .status(400)
-        .json({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: err.message,
-            details: err.errors,
-          },
-        });
+      return res.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: err.message,
+          details: err.errors,
+        },
+      });
     }
   });
 
@@ -148,15 +146,13 @@ export function createApp() {
         .get(req.params.id);
       return res.json({ task: updated });
     } catch (err) {
-      return res
-        .status(400)
-        .json({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: err.message,
-            details: err.errors,
-          },
-        });
+      return res.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: err.message,
+          details: err.errors,
+        },
+      });
     }
   });
 
@@ -196,15 +192,13 @@ export function createApp() {
         .get();
       return res.json({ preferences });
     } catch (err) {
-      return res
-        .status(400)
-        .json({
-          error: {
-            code: "VALIDATION_ERROR",
-            message: err.message,
-            details: err.errors,
-          },
-        });
+      return res.status(400).json({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: err.message,
+          details: err.errors,
+        },
+      });
     }
   });
 
@@ -226,11 +220,9 @@ export function createApp() {
     }
 
     if (!plan) {
-      return res
-        .status(404)
-        .json({
-          error: { code: "PLAN_NOT_FOUND", message: "No saved plan found" },
-        });
+      return res.status(404).json({
+        error: { code: "PLAN_NOT_FOUND", message: "No saved plan found" },
+      });
     }
 
     return res.json({
@@ -264,7 +256,7 @@ export function createApp() {
     const db = getDatabase();
     const rows = db
       .prepare(
-        'SELECT id, role, content, created_at FROM messages WHERE session_id = ? AND role IN ("user", "assistant") ORDER BY created_at ASC',
+        "SELECT id, role, content, created_at FROM messages WHERE session_id = ? AND role IN ('user', 'assistant') ORDER BY created_at ASC",
       )
       .all(req.params.sessionId);
     return res.json({ messages: rows });
@@ -272,14 +264,12 @@ export function createApp() {
 
   // 404 handler for undefined API routes
   app.use("/api", (req, res) => {
-    res
-      .status(404)
-      .json({
-        error: {
-          code: "NOT_FOUND",
-          message: `Route ${req.method} ${req.originalUrl} not found`,
-        },
-      });
+    res.status(404).json({
+      error: {
+        code: "NOT_FOUND",
+        message: `Route ${req.method} ${req.originalUrl} not found`,
+      },
+    });
   });
 
   return app;
