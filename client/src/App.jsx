@@ -1,6 +1,31 @@
-import React from "react";
+import { useState, useEffect } from "react";
+import { api } from "./services/api.js";
+import LoadingIndicator from "./components/ui/LoadingIndicator.jsx";
+import ErrorMessage from "./components/ui/ErrorMessage.jsx";
 
 export default function App() {
+  const [health, setHealth] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchHealth = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api.getHealth();
+      setHealth(data);
+    } catch (err) {
+      setError(err);
+      setHealth(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHealth();
+  }, []);
+
   return (
     <>
       <header>
@@ -9,15 +34,47 @@ export default function App() {
       </header>
       <main>
         <div className="welcome-card">
-          <h2>Frontend Initialized</h2>
+          <h2>Backend Connection Status</h2>
           <p>
-            ContextFlow productivity assistant dashboard will be constructed
-            here.
+            Verifying communication between React frontend and Express backend
+            via the Vite proxy.
           </p>
-          <div className="status-indicator">
-            <span className="status-dot"></span>
-            <span>Phase 2: React + Vite app ready</span>
-          </div>
+
+          {loading && (
+            <LoadingIndicator message="Connecting to ContextFlow backend..." />
+          )}
+
+          {error && <ErrorMessage error={error} onRetry={fetchHealth} />}
+
+          {health && (
+            <div
+              style={{
+                marginTop: "1rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+              }}
+            >
+              <div className="status-indicator">
+                <span
+                  className="status-dot"
+                  style={{ backgroundColor: "var(--success-color)" }}
+                ></span>
+                <span>
+                  Backend service: <strong>{health.service}</strong>
+                </span>
+              </div>
+              <div className="status-indicator">
+                <span
+                  className="status-dot"
+                  style={{ backgroundColor: "var(--success-color)" }}
+                ></span>
+                <span>
+                  Database: <strong>{health.database}</strong>
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </>
