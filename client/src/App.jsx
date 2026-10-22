@@ -12,6 +12,7 @@ import ErrorMessage from "./components/ui/ErrorMessage.jsx";
 export default function App() {
   const [health, setHealth] = useState(null);
   const [error, setError] = useState(null);
+  const [taskRefreshKey, setTaskRefreshKey] = useState(0);
 
   const fetchHealth = async () => {
     try {
@@ -28,15 +29,24 @@ export default function App() {
     fetchHealth();
   }, []);
 
+  const triggerTaskRefresh = () => {
+    setTaskRefreshKey((k) => k + 1);
+  };
+
   return (
     <>
       <AppHeader health={health} />
       <main>
         {error && <ErrorMessage error={error} onRetry={fetchHealth} />}
         <AppLayout
-          chat={<ChatPanel />}
+          chat={<ChatPanel onTaskCreated={triggerTaskRefresh} />}
           activity={<ToolActivityLog />}
-          tasks={<TaskList />}
+          tasks={
+            <TaskList
+              refreshTrigger={taskRefreshKey}
+              onTasksChanged={triggerTaskRefresh}
+            />
+          }
           plan={<PlanPanel />}
           preferences={<PreferencesForm />}
         />
