@@ -695,3 +695,99 @@ main {
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+
+/* Tool Activity Log Styles */
+.activity-panel {
+  max-height: 380px;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  animation: fadeIn 0.25s ease;
+}
+
+.activity-item.failed {
+  border-left: 3px solid var(--danger-color);
+}
+
+.activity-item.success {
+  border-left: 3px solid var(--success-color);
+}
+
+.activity-item-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.activity-icon {
+  font-size: 1.15rem;
+}
+
+.activity-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.activity-tool-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tool-name-tag {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-color);
+  background-color: rgba(47, 129, 247, 0.1);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.status-pill {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+}
+
+.status-pill.success {
+  color: var(--success-color);
+  background-color: rgba(35, 134, 54, 0.15);
+}
+
+.status-pill.failed {
+  color: var(--danger-color);
+  background-color: rgba(218, 54, 51, 0.15);
+}
+
+.activity-summary {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.activity-timestamp {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
